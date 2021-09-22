@@ -73,6 +73,11 @@ func runExecution(host string, token string, csv string) error {
 		return err
 	}
 
+	if len(entries) == 0 {
+		fmt.Println("Nothing to fill")
+		return nil
+	}
+
 	fmt.Printf("Before: %+v\n", entries)
 	client := http.Client{}
 	storage := &Storage{
