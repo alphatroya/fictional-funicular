@@ -1,11 +1,10 @@
 GO_BIN := $(GOPATH)/bin
 GOIMPORTS := $(GO_BIN)/goimports
 GOLANGCI := $(GO_BIN)/golangci-lint
-SWAGGER_DOC := $(GO_BIN)/swag
 
 ## build: Build an application
 .PHONY: build
-build: fmt docs
+build: fmt
 	go build -v -o main
 
 ## install: Install application
@@ -15,7 +14,7 @@ install:
 
 ## run: Run application
 .PHONY: run
-run: fmt docs
+run: fmt
 	go run .
 
 ## test: Launch unit tests
@@ -34,15 +33,6 @@ coverage:
 .PHONY:
 clean:
 	go clean
-
-## docs: Regenerate swagger docs
-.PHONY: docs
-docs: generate
-	$(SWAGGER_DOC) init
-
-## generate: Regenerate all required files
-generate: $(SWAGGER_DOC)
-	go generate
 
 ## tidy: Cleanup go.sum and go.mod files
 .PHONY: tidy
@@ -64,9 +54,6 @@ $(GOIMPORTS):
 
 $(GOLANGCI):
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.40.1
-
-$(SWAGGER_DOC):
-	go install github.com/swaggo/swag/cmd/swag@v1.7.0
 
 ## help: Prints help message
 .PHONY: help
