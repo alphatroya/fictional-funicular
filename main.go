@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,24 +20,33 @@ const (
 
 	tokenENV = "REDMINE_API_KEY"
 	hostENV  = "REDMINE_HOST"
+	debugENV = "DEBUG"
 )
 
 func init() {
-	err := viper.BindEnv(tokenENV)
-	if err != nil {
-		panic(err)
-	}
-	err = viper.BindEnv(hostENV)
-	if err != nil {
-		panic(err)
+	for _, key := range []string{
+		tokenENV,
+		hostENV,
+		debugENV,
+	} {
+		if err := viper.BindEnv(key); err != nil {
+			errLogger.Printf("Binding env error: %v", err)
+			os.Exit(1)
+		}
 	}
 }
+
+var infoLogger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+var errLogger = log.New(os.Stderr, "", 0)
 
 func main() {
 	main := cobra.Command{
 		Short:   "Command for processing csv file for time entries and pass it to project management tool",
 		Version: "0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !viper.IsSet(debugENV) {
+				infoLogger.SetOutput(io.Discard)
+			}
 			host := viper.GetString(hostENV)
 			token := viper.GetString(tokenENV)
 
@@ -52,12 +62,12 @@ func main() {
 			return runExecution(host, token, path)
 		},
 	}
-	main.Flags().String(csvFlag, "", "Path to csv file")
+	main.Flags().String(csvFlag, "", "path to csv file")
 	main.MarkFlagRequired(csvFlag)
 
 	err := main.Execute()
 	if err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 }
 
@@ -74,13 +84,13 @@ func runExecution(host string, token string, csv string) error {
 	}
 
 	if len(entries) == 0 {
-		fmt.Println("Nothing to fill")
+		infoLogger.Println("nothing to fill")
 		return nil
 	}
 
-	fmt.Printf("Before: %+v\n", entries)
+	infoLogger.Printf("before processing: %+v\n", entries)
 	client := http.Client{}
-	storage := &Storage{
+	storage := &storage{
 		host:  host,
 		token: token,
 	}
@@ -95,21 +105,21 @@ func runExecution(host string, token string, csv string) error {
 	for _, item := range resp {
 		today += float64(item.Hours)
 	}
-	fmt.Printf("%f\n", today)
+	infoLogger.Printf("counted hours today: %f\n", today)
 
 	entries, err = refillMissedHours(entries, today)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("After: %+v\n", entries)
+	infoLogger.Printf("after processing: %+v\n", entries)
 
 	for i, item := range entries {
 		res, err := r.FillHoursRequest(item.task, item.hours, item.comment, "")
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Item %d filled by result: %+v", i, res)
+		infoLogger.Printf("item #%d filled by result: %+v", i, res)
 	}
 
 	return nil
