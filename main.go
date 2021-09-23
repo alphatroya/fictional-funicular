@@ -18,20 +18,19 @@ import (
 const (
 	csvFlag = "csv"
 
-	tokenENV = "REDMINE_API_KEY"
+	credEnv  = "REDMINE_API_KEY"
 	hostENV  = "REDMINE_HOST"
 	debugENV = "DEBUG"
 )
 
 func init() {
 	for _, key := range []string{
-		tokenENV,
+		credEnv,
 		hostENV,
 		debugENV,
 	} {
 		if err := viper.BindEnv(key); err != nil {
-			errLogger.Printf("Binding env error: %v", err)
-			os.Exit(1)
+			errLogger.Fatalf("Binding env error: %v", err)
 		}
 	}
 }
@@ -48,10 +47,10 @@ func main() {
 				infoLogger.SetOutput(io.Discard)
 			}
 			host := viper.GetString(hostENV)
-			token := viper.GetString(tokenENV)
+			token := viper.GetString(credEnv)
 
 			if len(host) == 0 || len(token) == 0 {
-				return errors.New(tokenENV + " or " + hostENV + " are not set")
+				return errors.New(credEnv + " or " + hostENV + " are not set")
 			}
 
 			path, err := cmd.Flags().GetString(csvFlag)
@@ -63,10 +62,11 @@ func main() {
 		},
 	}
 	main.Flags().String(csvFlag, "", "path to csv file")
-	main.MarkFlagRequired(csvFlag)
+	if err := main.MarkFlagRequired(csvFlag); err != nil {
+		errLogger.Fatalf("Failed to make csv flag required: %v", err)
+	}
 
-	err := main.Execute()
-	if err != nil {
+	if err := main.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
@@ -141,7 +141,6 @@ func refillMissedHours(entries []entry, today float64) ([]entry, error) {
 			return entries, fmt.Errorf("Parsing float error: %w, item at line %d (%s) is not a float", err, i, hours)
 		}
 		alreadyFilled += f
-
 	}
 
 	if alreadyFilled >= todayGoal {
