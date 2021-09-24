@@ -7,8 +7,8 @@ import (
 
 func Test_refillMissedHours(t *testing.T) {
 	type args struct {
-		entries []fillItem
 		today   float64
+		entries []fillItem
 	}
 	tests := []struct {
 		name    string

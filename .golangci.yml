@@ -38,6 +38,8 @@ linters-settings:
     govet:
       check-shadowing: true
       enable-all: true
+      disable:
+        - fieldalignment
 
     tagliatelle:
       json: camel
