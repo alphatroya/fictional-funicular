@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
@@ -58,7 +57,7 @@ func main() {
 				return err
 			}
 
-			return runExecution(host, token, path)
+			return run(host, token, path)
 		},
 	}
 	main.Flags().String(csvFlag, "", "path to csv file")
@@ -71,7 +70,7 @@ func main() {
 	}
 }
 
-func runExecution(host string, token string, csv string) error {
+func run(host string, token string, csv string) error {
 	file, err := os.Open(csv)
 	if err != nil {
 		return err
@@ -125,7 +124,7 @@ func runExecution(host string, token string, csv string) error {
 	return nil
 }
 
-func refillMissedHours(entries []entry, today float64) ([]entry, error) {
+func refillMissedHours(entries []fillItem, today float64) ([]fillItem, error) {
 	const todayGoal float64 = 8
 
 	notFilledCount := 0
@@ -136,6 +135,7 @@ func refillMissedHours(entries []entry, today float64) ([]entry, error) {
 			notFilledCount++
 			continue
 		}
+		//nolint 64 is obvious magic number here
 		f, err := strconv.ParseFloat(hours, 64)
 		if err != nil {
 			return entries, fmt.Errorf("Parsing float error: %w, item at line %d (%s) is not a float", err, i, hours)
@@ -148,7 +148,7 @@ func refillMissedHours(entries []entry, today float64) ([]entry, error) {
 	}
 
 	remain := fmt.Sprintf("%f", (todayGoal-alreadyFilled)/float64(notFilledCount))
-	result := make([]entry, 0, len(entries))
+	result := make([]fillItem, 0, len(entries))
 	for _, item := range entries {
 		if len(item.hours) == 0 {
 			item.hours = remain
@@ -156,33 +156,4 @@ func refillMissedHours(entries []entry, today float64) ([]entry, error) {
 		result = append(result, item)
 	}
 	return result, nil
-}
-
-type entry struct {
-	task    string
-	hours   string
-	comment string
-}
-
-func parseCSV(file *os.File) ([]entry, error) {
-	result := make([]entry, 0)
-	reader := csv.NewReader(file)
-
-	for line := 0; ; line++ {
-		record, err := reader.Read()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				return result, nil
-			}
-			return nil, err
-		}
-		if len(record) < 3 {
-			return result, fmt.Errorf("Parsing line %d failed. Line should have more 3 items", line)
-		}
-		result = append(result, entry{
-			task:    record[0],
-			hours:   record[1],
-			comment: record[2],
-		})
-	}
 }
