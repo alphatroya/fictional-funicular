@@ -1,6 +1,7 @@
 GO_BIN := $(GOPATH)/bin
 GOIMPORTS := $(GO_BIN)/goimports
 GOLANGCI := $(GO_BIN)/golangci-lint
+GOMOCK := $(GO_BIN)/mockgen
 
 ## build: Build an application
 .PHONY: build
@@ -19,8 +20,13 @@ run: fmt
 
 ## test: Launch unit tests
 .PHONY: test
-test:
+test: generate
 	go test ./...
+
+## generate: Generate files
+.PHONY: generate
+generate: $(GOMOCK)
+	go generate
 
 ## coverage: Launch unit tests
 .PHONY: coverage
@@ -54,6 +60,9 @@ $(GOIMPORTS):
 
 $(GOLANGCI):
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.40.1
+
+$(GOMOCK):
+	go install github.com/golang/mock/mockgen@v1.6.0
 
 ## help: Prints help message
 .PHONY: help

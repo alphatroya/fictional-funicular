@@ -93,17 +93,10 @@ func run(host string, token string, csv string) error {
 	}
 	r := redmine.NewClientManager(&client, storage, 0)
 
-	resp, err := r.TodayTimeEntries()
+	today, err := fetchTodayTotalSum(r)
 	if err != nil {
 		return err
 	}
-
-	today := 0.0
-	for _, item := range resp {
-		today += float64(item.Hours)
-	}
-	infoLogger.Printf("counted hours today: %f\n", today)
-
 	entries, err = refillMissedHours(entries, today)
 	if err != nil {
 		return err
