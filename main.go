@@ -85,7 +85,6 @@ func run(host string, token string, csv string) error {
 		return nil
 	}
 
-	infoLogger.Printf("before processing: %+v\n", entries)
 	client := http.Client{}
 	storage := &storage{
 		host:  host,
@@ -102,15 +101,5 @@ func run(host string, token string, csv string) error {
 		return err
 	}
 
-	infoLogger.Printf("after processing: %+v\n", entries)
-
-	for i, item := range entries {
-		res, err := r.FillHoursRequest(item.task, item.hours, item.comment, "")
-		if err != nil {
-			return err
-		}
-		infoLogger.Printf("item #%d filled by result: %+v", i, res)
-	}
-
-	return nil
+	return makeFillRequests(r, entries)
 }
