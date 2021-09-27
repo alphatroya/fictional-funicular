@@ -39,6 +39,11 @@ func Test_parseCSV(t *testing.T) {
 			input:   "1,,Test\n2,",
 			wantErr: true,
 		},
+		{
+			name:    "valid csv file but empty issue id",
+			input:   ",,Test",
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
