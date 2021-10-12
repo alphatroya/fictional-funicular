@@ -37,7 +37,20 @@ var errLogger = log.New(os.Stderr, "", 0)
 
 func main() {
 	main := cobra.Command{
-		Short:   "Command for processing csv file for time entries and pass it to project management tool",
+		Short: "Command for processing csv file for time entries and pass it to project management tool",
+		Long: `
+Command for processing csv file for time entries and pass it to project management tool
+
+Passed .csv file should have the following structure:
+- It should contain 3 rows.
+- First row is a task number, it is required.
+- Second row is a float number with the time entry amount (in hours). It's optional.
+	- If the field is empty, it will be considered as a filler field. The program will calculate the spare
+	amount of hours for today and divide it by fillers.
+- Third row is a time entry description, the string, also required
+The sum of the hours in the day should not exceed the 8 hours minus the already logged amount.
+For example, if you log 3 hours today, your max hours limit is 5 for today.
+		`,
 		Version: "0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.IsSet(debugENV) {
