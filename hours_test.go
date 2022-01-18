@@ -34,6 +34,27 @@ func Test_refillMissedHours(t *testing.T) {
 			},
 		},
 		{
+			name: "exact 8 hours",
+			args: args{
+				entries: []fillItem{
+					{
+						hours: "1",
+					},
+					{
+						hours: "7",
+					},
+				},
+			},
+			want: []fillItem{
+				{
+					hours: "1",
+				},
+				{
+					hours: "7",
+				},
+			},
+		},
+		{
 			name: "already logged 5 and two empty tasks",
 			args: args{
 				entries: []fillItem{

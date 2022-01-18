@@ -8,7 +8,7 @@ import (
 
 func refillMissedHours(entries []fillItem, today float64) ([]fillItem, error) {
 	const todayGoal float64 = 8
-	var remainToday = todayGoal - today
+	remainToday := todayGoal - today
 	if remainToday <= 0 {
 		return entries, errors.New("already logged 8 hours")
 	}
@@ -29,7 +29,7 @@ func refillMissedHours(entries []fillItem, today float64) ([]fillItem, error) {
 		alreadyFilled += f
 	}
 
-	if alreadyFilled >= remainToday {
+	if almostEqualOfGreat(alreadyFilled, remainToday) {
 		return entries, errors.New("Cancel task, you already reach the goal")
 	}
 
@@ -42,4 +42,10 @@ func refillMissedHours(entries []fillItem, today float64) ([]fillItem, error) {
 		result = append(result, item)
 	}
 	return result, nil
+}
+
+const float64EqualityThreshold = 1e-9
+
+func almostEqualOfGreat(a, b float64) bool {
+	return a-b > float64EqualityThreshold
 }
