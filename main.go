@@ -32,8 +32,10 @@ func init() {
 	}
 }
 
-var infoLogger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
-var errLogger = log.New(os.Stderr, "", 0)
+var (
+	infoLogger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	errLogger  = log.New(os.Stderr, "", 0)
+)
 
 func main() {
 	main := cobra.Command{

@@ -24,13 +24,13 @@ func refillMissedHours(entries []fillItem, today float64) ([]fillItem, error) {
 		//nolint 64 is obvious magic number here
 		f, err := strconv.ParseFloat(hours, 64)
 		if err != nil {
-			return entries, fmt.Errorf("Parsing float error: %w, item at line %d (%s) is not a float", err, i, hours)
+			return entries, fmt.Errorf("refillMissedHours: parsing float item at line %d (%s) is not a float: %w", i, hours, err)
 		}
 		alreadyFilled += f
 	}
 
 	if almostEqualOfGreat(alreadyFilled, remainToday) {
-		return entries, errors.New("Cancel task, you already reach the goal")
+		return entries, errors.New("refillMissedHours: you already reach the goal today")
 	}
 
 	remain := fmt.Sprintf("%.2f", (remainToday-alreadyFilled)/float64(notFilledCount))

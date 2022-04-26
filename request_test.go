@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/alphatroya/fictional-funicular/mocks"
-	m "github.com/alphatroya/fictional-funicular/mocks"
 	"github.com/alphatroya/redmine-helper-bot/redmine"
 	"github.com/golang/mock/gomock"
 )
@@ -61,7 +60,7 @@ func Test_fetchTodayTotalSum(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			mock := m.NewMockClient(ctrl)
+			mock := mocks.NewMockClient(ctrl)
 			mock.
 				EXPECT().
 				TodayTimeEntries().

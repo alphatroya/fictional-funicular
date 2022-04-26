@@ -27,7 +27,7 @@ func (s *storage) SetActivity(activity string, chat int64) {
 }
 
 func (s *storage) GetActivity(chat int64) (string, error) {
-	return "", errors.New("Activity is not implemented")
+	return "", errors.New("get activity: activity is not implemented")
 }
 
 func (s *storage) ResetData(chat int64) error {

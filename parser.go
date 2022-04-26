@@ -28,7 +28,7 @@ func parseCSV(file io.Reader) ([]fillItem, error) {
 			return nil, err
 		}
 		if len(record) < itemRowCount {
-			return nil, fmt.Errorf("Parsing line %d failed. Line should have more 3 items", line)
+			return nil, fmt.Errorf("parseCSV: parsing line %d failed: line should have more 3 items", line)
 		}
 		item := fillItem{
 			task:    record[0],
@@ -37,7 +37,7 @@ func parseCSV(file io.Reader) ([]fillItem, error) {
 		}
 
 		if item.task == "" {
-			return nil, errors.New("Task id should not be empty")
+			return nil, errors.New("parseCSV: task id should not be empty")
 		}
 
 		result = append(result, item)
