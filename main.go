@@ -41,17 +41,16 @@ func main() {
 	main := cobra.Command{
 		Short: "Command for processing csv file for time entries and pass it to project management tool",
 		Long: `
-Command for processing csv file for time entries and pass it to project management tool
+Command for processing a CSV file containing time entries and transferring it to a project management tool.
 
-Passed .csv file should have the following structure:
-- It should contain 3 rows.
-- First row is a task number, it is required.
-- Second row is a float number with the time entry amount (in hours). It's optional.
-	- If the field is empty, it will be considered as a filler field. The program will calculate the spare
-	amount of hours for today and divide it by fillers.
-- Third row is a time entry description, the string, also required
-The sum of the hours in the day should not exceed the 8 hours minus the already logged amount.
-For example, if you log 3 hours today, your max hours limit is 5 for today.
+The CSV file should adhere to the following structure:
+- It must consist of 3 rows.
+- The first row should denote the task number, which is mandatory.
+- The second row should represent the time entry amount in hours as a floating-point number. This field is optional.
+  - If left empty, it will be treated as a filler field. The program will then calculate the remaining available hours for the day and distribute them among the filler entries.
+- The third row should contain the time entry description, which is also mandatory.
+The total hours logged in a day should not exceed 8 hours minus the already logged amount.
+For instance, if 3 hours are logged today, the maximum allowable hours for today would be 5..
 		`,
 		Version: "0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
