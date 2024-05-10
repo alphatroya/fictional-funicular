@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/alphatroya/redmine-helper-bot/redmine"
 	"github.com/spf13/cobra"
@@ -13,7 +15,8 @@ import (
 )
 
 const (
-	csvFlag = "csv"
+	csvFlag      = "csv"
+	vacationFlag = "vacation-file"
 
 	credEnv  = "REDMINE_API_KEY"
 	hostENV  = "REDMINE_HOST"
@@ -64,6 +67,19 @@ For instance, if 3 hours are logged today, the maximum allowable hours for today
 				return errors.New(credEnv + " or " + hostENV + " are not set")
 			}
 
+			vacationFile, err := cmd.Flags().GetString(vacationFlag)
+			if err == nil {
+				today := time.Now()
+				isVacation, err := checkVacation(vacationFile, today)
+				if err != nil {
+					return err
+				}
+				if isVacation {
+					infoLogger.Println("today is vacation, skipping")
+					return nil
+				}
+			}
+
 			path, err := cmd.Flags().GetString(csvFlag)
 			if err != nil {
 				return err
@@ -80,6 +96,29 @@ For instance, if 3 hours are logged today, the maximum allowable hours for today
 	if err := main.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func checkVacation(vacation string, today time.Time) (bool, error) {
+	file, err := os.Open(vacation)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		dateStr := scanner.Text()
+		date, err := time.Parse("02.01.2006", dateStr)
+		if err != nil {
+			return false, err
+		}
+
+		if date.Day() == today.Day() && date.Month() == today.Month() && date.Year() == today.Year() {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func run(host string, token string, csv string) error {
