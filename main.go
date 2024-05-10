@@ -89,6 +89,7 @@ For instance, if 3 hours are logged today, the maximum allowable hours for today
 		},
 	}
 	main.Flags().String(csvFlag, "", "path to csv file")
+	main.Flags().String(vacationFlag, "", "path to the vacation file")
 	if err := main.MarkFlagRequired(csvFlag); err != nil {
 		errLogger.Fatalf("Failed to make csv flag required: %v", err)
 	}
