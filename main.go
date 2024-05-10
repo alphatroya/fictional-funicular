@@ -36,8 +36,9 @@ func init() {
 }
 
 var (
-	infoLogger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	errLogger  = log.New(os.Stderr, "", 0)
+	infoLogger  = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	debugLogger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	errLogger   = log.New(os.Stderr, "", 0)
 )
 
 func main() {
@@ -58,7 +59,7 @@ For instance, if 3 hours are logged today, the maximum allowable hours for today
 		Version: "0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.IsSet(debugENV) {
-				infoLogger.SetOutput(io.Discard)
+				debugLogger.SetOutput(io.Discard)
 			}
 			host := viper.GetString(hostENV)
 			token := viper.GetString(credEnv)
@@ -75,7 +76,7 @@ For instance, if 3 hours are logged today, the maximum allowable hours for today
 					return err
 				}
 				if isVacation {
-					infoLogger.Println("today is vacation, skipping")
+					debugLogger.Println("today is vacation, skipping")
 					return nil
 				}
 			}
@@ -135,7 +136,7 @@ func run(host string, token string, csv string) error {
 	}
 
 	if len(entries) == 0 {
-		infoLogger.Println("nothing to fill")
+		debugLogger.Println("nothing to fill")
 		return nil
 	}
 
