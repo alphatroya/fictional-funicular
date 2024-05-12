@@ -54,8 +54,11 @@ The CSV file should adhere to the following structure:
   - If left empty, it will be treated as a filler field. The program will then calculate the remaining available hours for the day and distribute them among the filler entries.
 - The third row should contain the time entry description, which is also mandatory.
 The total hours logged in a day should not exceed 8 hours minus the already logged amount.
-For instance, if 3 hours are logged today, the maximum allowable hours for today would be 5..
-		`,
+For instance, if 3 hours are logged today, the maximum allowable hours for today would be 5.
+
+Vacation file is optional separated newline separated plain text file. It represents a list of days when time tracking items will not being logged.
+Dates should be in dd-MM-yyyy format.
+`,
 		Version: "0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.IsSet(debugENV) {
